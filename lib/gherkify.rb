@@ -25,12 +25,8 @@ module Gherkify
 
     formatter.done
     # ap JSON.parse(io.string, :symbolize_names => true)
-    f_data = JSON.parse(io.string, :symbolize_names => true)
-    features = []
-
-    f_data.each { |e| features << Gherkify::Feature.new(e)  }
-
-    features
+    features = JSON.parse(io.string, :symbolize_names => true)
+    features.collect { |e| Gherkify::Feature.new(e)  }
   end
 
   # Parses feature file
