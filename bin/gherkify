@@ -3,138 +3,43 @@
 
 #$LOAD_PATH
 
-begin
-  require 'gherkify'
-rescue LoadError
-  lib = File.expand_path('../lib', __FILE__)
-  $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-  require 'gherkify'
-end
+# begin
+require 'gherkify'
+# rescue LoadError
+#   lib = File.expand_path('../../lib', __FILE__)
+#   $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+#   require 'gherkify'
+# end
 
+require 'slop'
 require 'awesome_print'
 
 def main
+  opts = Slop.parse(help: true) do
+    banner 'Usage: gherkify path [options]'
+    on 'd', 'dir', 'Output directory', argument: :optional
+  end
 
   path = ARGV[0]
-  return if path.nil?
+  puts opts.help and return if path.nil?
+  puts "#{path} -> #{opts[:dir]}" if opts.dir?
 
-  io = StringIO.new
-  formatter = Gherkin::Formatter::JSONFormatter.new(io)
-  parser = Gherkin::Parser::Parser.new(formatter)
-  parser.parse(IO.read(path), path, 0)
-
-  formatter.done
-  # ap JSON.parse(io.string, :symbolize_names => true)
-  features = JSON.parse(io.string, :symbolize_names => true)
-  @data = features[0]
-
-  actor = get_actor
-  feature = get_feature
-  scenarios_names = get_scenarios_names
-
-
-  
-  usecase_text = yuml_use_case(actor, feature, scenarios_names)
-  puts "--> #{feature} #{md5(usecase_text)}"
-  puts "#{usecase_text}\n"
-
-  get_scenarios.each do |e| 
-    name = yuml_trim(e[:name])
-    a = yuml_activity(e)
-    puts "* #{name} #{md5(a)} \n#{a}\n\n"
+  if File.directory? path
+    files = Dir.glob(File.join(path, "*.feature"))
+  else
+    files = [path]
   end
 
+  features = Gherkify.parse_files(files)
+
+  features.each { |e| puts e.to_s }
+    
 
 end
 
-def md5(s)
-  Digest::MD5.hexdigest(s)
-end
 
-def get_actor
-  @data[:description].split("\n").each do |e|
-    if e =~ /^as a/i
-      actor = e.sub(/^as a/i, '').sub(/,$/, '').strip
-      return yuml_trim(actor)
-    end
-  end
-  return "Actor"
-end
 
-def get_note
-  t = @data[:description].split("\n").select { |e| true unless e =~ /^as a/i } * "\n"
-  yuml_trim(t)
-end
 
-def get_feature
-  yuml_trim(@data[:name])
-end
-
-def get_scenarios
-  @data[:elements].select { |e| e[:keyword] == 'Scenario' }
-end
-
-def get_scenarios_names
-  get_scenarios.collect { |e| yuml_trim(e[:name]) }
-end
-
-def yuml_trim(text)
-  text.gsub(/[,()\[\]^><-]/, '').strip
-end
-
-def yuml_use_case(actor, feature, scenarios, note=nil)
-  t = []
-  t << "[#{actor}]-(note: #{note}{bg:beige})" if note
-  t << "[#{actor}]-(#{feature})"
-  scenarios.each do |e| 
-    # e.gsub!('-', '‐') # yUML '-' bug
-    s = yuml_trim(e)
-    t << "(#{feature})<(#{s})"
-  end
-
-  t * ', '
-end
-
-def yuml_activity(scenario)
-  steps = scenario[:steps]
-  t = []
-
-  t_steps = []
-  t_results = []
-
-  do_results = false
-
-  t << "(start)"
-
-  steps.each do |e|
-
-    if e[:keyword].strip == 'Then'
-      do_results = true
-    end
-
-    step = yuml_trim(e[:name])
-    if e[:keyword].strip == 'Given'
-      t << "[#{step}]"
-    else
-      step.sub!(/^I /i, '')
-      if do_results
-        t_results << "|b|->(#{step})->|c|"
-      else
-        t_steps << "(#{step})"
-      end
-      
-    end
-  end
-
-  t << t_steps * '->'
-  t << '|b|'
-
-  t_start_s = t * '->'
-  t_results_s = t_results * ','
-  t_end_s = "|c|->(end)"
-
-  return t_start_s + ',' + t_results_s + ',' + t_end_s
-end
 
 # url: http://yuml.me/diagram/scruffy;scale:80;/class/
 # params: dsl_text = [Customer]->[Billing Address]

@@ -37,12 +37,30 @@ class Gherkify::Feature
   end
 
   def yuml
-    Gherkify::FeatureYuml(self)
+    @yuml ||= Gherkify::FeatureYuml.new(self)
+  end
+
+  def to_s
+    s = []
+    s << "Feature: #{name}"
+
+    use_case = yuml.use_case
+    s << "Use Case: #{use_case.md5}"
+    s << use_case.to_s
+    s << "Activities: "
+
+    scenarios.each do |e|
+      activity = yuml.activity(e)
+      s << "#{activity.md5}:"
+      s << "#{activity.to_s}"
+    end
+
+    s * "\n"
   end
 
   private
   def trim(text)
-    text = text.strip
+    text.strip
   end
   
 end
