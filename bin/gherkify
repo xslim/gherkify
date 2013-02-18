@@ -32,8 +32,8 @@ def main
 
   gherkify = Gherkify.parse_files(files, {output_dir: output_dir})
   # gherkify.fetch_diagram_images
-  # puts gherkify.to_md('index.md')
-  puts gherkify.to_s
+  puts gherkify.to_md('index.md')
+  # puts gherkify.to_s
     
 
 end

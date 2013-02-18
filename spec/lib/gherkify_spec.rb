@@ -32,7 +32,6 @@ describe Gherkify do
     |i|->("Dixie Burger & Gumbo Soup" should be rated 5 stars)->|j|
     |j|->(end)
     EXPECTED
-
     expected.gsub!(/\s/,'')
 
     ret = Gherkify.parse_file(file).to_s

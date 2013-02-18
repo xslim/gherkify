@@ -1,8 +1,13 @@
 # Gherkify
 
-TODO: Write a gem description
+Generate yUML diagrams and other stuff from Gherkin Cucumber feature files
 
 ## Installation
+
+You need `ruby-yuml`, which is currently not published on ruby-gems, so to install it use  `specific_install`
+
+    gem install specific_install
+    gem specific_install -l https://github.com/xslim/ruby-yuml.git
 
 Add this line to your application's Gemfile:
 
@@ -18,7 +23,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Usage: `gherkify path_to_features -d output_directory`
 
 ## Contributing
 

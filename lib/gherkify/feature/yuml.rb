@@ -45,7 +45,7 @@ class Gherkify::FeatureYuml
     last_step = nil
     # puts "connector: #{connector}, #{c1} -> #{c2}"
     use_connector = !connector.nil? || false
-    prev_step = nil if !connector.nil?
+    prev_step = nil if use_connector
 
     prev_step_n = final_steps.count - 1
     prev_step_line = final_steps[prev_step_n]
@@ -54,7 +54,7 @@ class Gherkify::FeatureYuml
     when :given
       if steps.count > 1
         use_connector = true
-        final_steps[prev_step_n] = prev_step_line + "->|#{c1}|" if !prev_step.nil?
+        final_steps[prev_step_n] = prev_step_line + "->|#{c1}|" if prev_step
         ok += steps.collect { |e| "|#{c1}|->#{yuml._[e].to_s}->|#{c2}|" }
       else
         text = yuml._[steps.first].to_s
@@ -83,7 +83,7 @@ class Gherkify::FeatureYuml
       end
     when :then
       use_connector = true
-      final_steps[prev_step_n] = prev_step_line + "->|#{c1}|" if !prev_step.nil?
+      final_steps[prev_step_n] = prev_step_line + "->|#{c1}|" if prev_step
       ok += steps.collect { |e| "|#{c1}|->#{yuml._(e).to_s}->|#{c2}|" }
     end
 
@@ -147,8 +147,6 @@ class Gherkify::FeatureYuml
 
       if curr_step != prev_step && prev_step != :trash
         # dump previous steps
-        last_step = nil if prev_connector
-        
         dumped = dump_activity_steps(yuml, steps[prev_step], prev_step, prev_connector, last_step, steps[:ok])
         curr_connector  = dumped[:connector]
         dumped_steps    = dumped[:steps]
@@ -168,7 +166,6 @@ class Gherkify::FeatureYuml
 
       # dump the last one
       if i == num_steps-1
-        last_step = nil if prev_connector
         dumped = dump_activity_steps(yuml, steps[curr_step], prev_step, prev_connector, last_step, steps[:ok])
         curr_connector  = dumped[:connector]
         dumped_steps    = dumped[:steps]

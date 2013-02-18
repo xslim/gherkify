@@ -1,6 +1,5 @@
 require 'gherkify/version'
 require 'gherkify/feature'
-require 'yuml_diagram'
 
 require 'gherkin/parser/parser'
 require 'gherkin/formatter/json_formatter'
