@@ -13,7 +13,7 @@ You need `ruby-yuml`, which is currently not published on ruby-gems, so to insta
 
 Add this line to your application's Gemfile:
 
-    gem 'gherkify'
+    gem 'gherkify', :git => "https://github.com/xslim/gherkify.git"
 
 And then execute:
 
@@ -21,7 +21,8 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install gherkify
+    //$ gem install gherkify
+    gem specific_install -l https://github.com/xslim/gherkify.git
 
 ## Usage
 
