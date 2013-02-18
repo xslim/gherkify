@@ -38,7 +38,7 @@ class Gherkify::FeatureYuml
     }
   end
 
-  def self.dump_activity_steps(yuml, steps, type, connector=nil, prev_step=nil)
+  def self.dump_activity_steps(yuml, steps, type, connector=nil, prev_step=nil, final_steps)
     ok = []
     c1 = connector || 'a'
     c2 = (c1..'zz').to_a[1]
@@ -46,44 +46,44 @@ class Gherkify::FeatureYuml
     # puts "connector: #{connector}, #{c1} -> #{c2}"
     use_connector = !connector.nil? || false
     prev_step = nil if !connector.nil?
+
+    prev_step_n = final_steps.count - 1
+    prev_step_line = final_steps[prev_step_n]
+
     case type 
     when :given
       if steps.count > 1
         use_connector = true
-        ok << "#{prev_step}->|#{c1}|" if !prev_step.nil?
+        final_steps[prev_step_n] = prev_step_line + "->|#{c1}|" if !prev_step.nil?
         ok += steps.collect { |e| "|#{c1}|->#{yuml._[e].to_s}->|#{c2}|" }
       else
         text = yuml._[steps.first].to_s
         last_step = text
-        text = "|#{c1}|->#{text}->|#{c2}|" if use_connector
-        if !prev_step.nil?
-          if use_connector
-            last_step = nil
-            ok << "#{prev_step}->|#{c1}|"
-          else
-            text = "#{prev_step}->#{text}"
-          end
+        ok << "|#{c1}|->#{text}->|#{c2}|" if use_connector
+        if use_connector
+          last_step = nil
+          final_steps[prev_step_n] = prev_step_line + "->|#{c1}|"
+        else
+          final_steps[prev_step_n] = prev_step_line + "->#{text}"  
         end
-        ok << text
       end
     when :when
       text_steps = steps.collect { |e| yuml._(e).to_s }
       last_step = text_steps.last
       text = text_steps * '->'
-      text = "|#{c1}|->#{text}->|#{c2}|" if use_connector
+      ok << "|#{c1}|->#{text}->|#{c2}|" if use_connector
 
       if !prev_step.nil?
         if use_connector
           last_step = nil
-          ok << "#{prev_step}->|#{c1}|"
+          final_steps[prev_step_n] = prev_step_line + "->|#{c1}|"
         else
-          text = "#{prev_step}->#{text}"
+          final_steps[prev_step_n] = prev_step_line + "->#{text}"
         end
       end
-      ok << text
     when :then
       use_connector = true
-      ok << "#{prev_step}->|#{c1}|" if !prev_step.nil?
+      final_steps[prev_step_n] = prev_step_line + "->|#{c1}|" if !prev_step.nil?
       ok += steps.collect { |e| "|#{c1}|->#{yuml._(e).to_s}->|#{c2}|" }
     end
 
@@ -94,6 +94,13 @@ class Gherkify::FeatureYuml
       c1: c1,
       c2: c2
     }
+  end
+
+  def optimize_activity_steps(steps)
+    steps.each_with_index do |e, i|
+
+    end
+    steps
   end
 
   def self.activity(scenario, scale=75)
@@ -120,8 +127,10 @@ class Gherkify::FeatureYuml
 
     num_steps = ssteps.count
 
-    ssteps.each_with_index do |e, i|
+    # start with start
+    steps[:ok] << yuml._(:start).to_s
 
+    ssteps.each_with_index do |e, i|
       step = trim(e[:name])
 
       # puts "key: #{e[:keyword]}"
@@ -138,10 +147,9 @@ class Gherkify::FeatureYuml
 
       if curr_step != prev_step && prev_step != :trash
         # dump previous steps
-        last_step = yuml._(:start).to_s if first_step
         last_step = nil if prev_connector
         
-        dumped = dump_activity_steps(yuml, steps[prev_step], prev_step, prev_connector, last_step)
+        dumped = dump_activity_steps(yuml, steps[prev_step], prev_step, prev_connector, last_step, steps[:ok])
         curr_connector  = dumped[:connector]
         dumped_steps    = dumped[:steps]
         last_step       = dumped[:last_step]
@@ -161,7 +169,7 @@ class Gherkify::FeatureYuml
       # dump the last one
       if i == num_steps-1
         last_step = nil if prev_connector
-        dumped = dump_activity_steps(yuml, steps[curr_step], prev_step, prev_connector, last_step)
+        dumped = dump_activity_steps(yuml, steps[curr_step], prev_step, prev_connector, last_step, steps[:ok])
         curr_connector  = dumped[:connector]
         dumped_steps    = dumped[:steps]
         last_step       = dumped[:last_step]
@@ -175,11 +183,13 @@ class Gherkify::FeatureYuml
       prev_step = curr_step
     end
 
+    steps[:ok] << ((prev_connector.nil?) ? last_step : "|#{prev_connector}|") + "->(end)"
+
+    # final_steps = optimize_activity_steps(steps[:ok])
+
     steps[:ok].each do |e|
       yuml.link_s e
     end
-
-    yuml.link_s ((prev_connector.nil?) ? last_step : "|#{prev_connector}|") + "->(end)"
 
     yuml
   end

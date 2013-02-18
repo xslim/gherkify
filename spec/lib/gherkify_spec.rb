@@ -18,9 +18,8 @@ describe Gherkify do
     (Rating a stand)<(Find and rate a stand from the list)
 
     Activities: 
-    Find and rate a stand from the list 77ada630bdf0d1ae873855acc6e453a8:
-    (start)->[am on the foodstand list]
-    [am on the foodstand list]->|a|
+    Find and rate a stand from the list eb86d8258530f6aef0c4a2640c2149ba:
+    (start)->[am on the foodstand list]->|a|
     |a|->(should see a "rating" button)->|b|
     |a|->(should not see "Dixie Burger & Gumbo Soup")->|b|
     |b|->(touch the "rating" button)->|c|
@@ -36,8 +35,9 @@ describe Gherkify do
 
     expected.gsub!(/\s/,'')
 
-    ret = Gherkify.parse_file(file).to_s.gsub(/\s/,'')
-    ret.should eq(expected)
+    ret = Gherkify.parse_file(file).to_s
+    # puts ret
+    ret.gsub(/\s/,'').should eq(expected)
   end
 
 end

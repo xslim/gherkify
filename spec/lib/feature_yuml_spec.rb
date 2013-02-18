@@ -10,7 +10,7 @@ describe Gherkify::FeatureYuml do
       { keyword: 'When',  name: 'I plant a tree' },
       { keyword: 'And',   name: 'I plant a second tree' },
       { keyword: 'Then',  name: 'I have two trees' },
-      { keyword: 'And',   name: 'I a house' }
+      { keyword: 'And',   name: 'a house' }
       ]
     }
   end
@@ -47,10 +47,7 @@ describe Gherkify::FeatureYuml do
   end
 
   it "builds yUML Activity Diagram" do
-    
-
-    # expected = "(start)->|I have house|->(plant a tree)->(plant a second tree)->|b|,|b|->(have two trees)->|c|,|b|->(a house)->|c|,|c|->(end)"
-    expected = "(start)->[have house],[have house]->(plant a tree)->(plant a second tree),(plant a second tree)->|a|,|a|->(have two trees)->|b|,|a|->(a house)->|b|,|b|->(end)"
+    expected = "(start)->[have house]->(plant a tree)->(plant a second tree)->|a|,|a|->(have two trees)->|b|,|a|->(a house)->|b|,|b|->(end)"
 
     yuml = subject.activity(sample_scenario)
     yuml.to_line.should == expected
@@ -58,8 +55,7 @@ describe Gherkify::FeatureYuml do
 
   it "calculates MD5 for diagram" do
     yuml = subject.activity(sample_scenario)
-    # expected = "4ac9adcf81feb7bc14e2670fb1245be8"
-    expected = "be3b8017b1ebac13ee1b7e2cdba514c3"
+    expected = "1bf8e91967ec177d335720a062644545"
     yuml.md5.should == expected
   end
   
