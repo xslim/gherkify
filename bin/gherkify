@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 # -*- encoding: utf-8 -*-
 
-#$LOAD_PATH
-
 # begin
 require 'gherkify'
 # rescue LoadError
@@ -21,8 +19,10 @@ def main
   end
 
   path = ARGV[0]
-  puts opts.help and return if path.nil?
-  puts "#{path} -> #{opts[:dir]}" if opts.dir?
+  puts opts.help if path.nil?
+  return if path.nil?
+
+  output_dir = (opts.dir?) ? opts[:dir] : '.'
 
   if File.directory? path
     files = Dir.glob(File.join(path, "*.feature"))
@@ -30,9 +30,10 @@ def main
     files = [path]
   end
 
-  features = Gherkify.parse_files(files)
-
-  features.each { |e| puts e.to_s }
+  gherkify = Gherkify.parse_files(files, {output_dir: output_dir})
+  # gherkify.fetch_diagram_images
+  # puts gherkify.to_md('index.md')
+  puts gherkify.to_s
     
 
 end

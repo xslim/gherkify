@@ -32,8 +32,12 @@ class Gherkify::Feature
     @data[:elements].select { |e| e[:keyword] == 'Scenario' }
   end
 
+  def scenario_name(scenario)
+    trim(scenario[:name])
+  end
+
   def scenarios_names
-    scenarios.collect { |e| trim(e[:name]) }
+    scenarios.collect { |e| scenario_name(e) }
   end
 
   def yuml
@@ -50,8 +54,9 @@ class Gherkify::Feature
     s << "Activities: "
 
     scenarios.each do |e|
+      name = scenario_name(e)
       activity = yuml.activity(e)
-      s << "#{activity.md5}:"
+      s << "#{name} #{activity.md5}:"
       s << "#{activity.to_s}"
     end
 

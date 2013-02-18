@@ -4,15 +4,16 @@ describe Gherkify::FeatureYuml do
 
   subject { Gherkify::FeatureYuml }
 
-  @scenario = {
+  def sample_scenario
     {steps: [
       { keyword: 'Given', name: 'I have house' },
       { keyword: 'When',  name: 'I plant a tree' },
       { keyword: 'And',   name: 'I plant a second tree' },
       { keyword: 'Then',  name: 'I have two trees' },
       { keyword: 'And',   name: 'I a house' }
-    ]
+      ]
     }
+  end
   
   it "trims special characters" do
     pending "Move this to YUML spec"
@@ -48,18 +49,18 @@ describe Gherkify::FeatureYuml do
   it "builds yUML Activity Diagram" do
     
 
-    expected = "(start)->|I have house|->(plant a tree)->(plant a second tree)->|b|,|b|->(have two trees)->|c|,|b|->(a house)->|c|,|c|->(end)"
+    # expected = "(start)->|I have house|->(plant a tree)->(plant a second tree)->|b|,|b|->(have two trees)->|c|,|b|->(a house)->|c|,|c|->(end)"
+    expected = "(start)->[have house],[have house]->(plant a tree)->(plant a second tree),(plant a second tree)->|a|,|a|->(have two trees)->|b|,|a|->(a house)->|b|,|b|->(end)"
 
-    yuml = subject.activity(@scenario)
+    yuml = subject.activity(sample_scenario)
     yuml.to_line.should == expected
-
-    ap yuml.to_url
-    ap yuml.md5
   end
 
   it "calculates MD5 for diagram" do
-    yuml = subject.activity(@scenario)
-    yuml.md5.should == "4ac9adcf81feb7bc14e2670fb1245be8"
+    yuml = subject.activity(sample_scenario)
+    # expected = "4ac9adcf81feb7bc14e2670fb1245be8"
+    expected = "be3b8017b1ebac13ee1b7e2cdba514c3"
+    yuml.md5.should == expected
   end
   
 end
