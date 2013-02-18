@@ -2,6 +2,8 @@
 
 Generate yUML diagrams and other stuff from Gherkin Cucumber feature files
 
+Sample output: http://kalapun.com/portfolio/tmp/gherkin/
+
 ## Installation
 
 You need `ruby-yuml`, which is currently not published on ruby-gems, so to install it use  `specific_install`
