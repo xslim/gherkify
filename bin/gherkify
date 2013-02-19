@@ -10,37 +10,47 @@ require 'gherkify'
 # end
 
 require 'slop'
-require 'awesome_print'
 
 def main
   opts = Slop.parse(help: true) do
     banner 'Usage: gherkify path [options]'
     on 'o', 'dir', 'Output directory', argument: :optional
-    on 'd', 'dry', 'Output directory', argument: :optional
+    on 'dry', 'Output directory', argument: :optional
+    on 'p', 'project', 'Generate project', argument: :optional
   end
 
   path = ARGV[0]
   puts opts.help if path.nil?
   return if path.nil?
 
+  features_path = path
   output_dir = (opts.dir?) ? opts[:dir] : '.'
+  image_path = output_dir
+
+  if opts.project?
+    output_dir = path
+    features_path = File.join(path, 'features') 
+    image_path = File.join(path, 'images') 
+  end
+  
 
   if File.directory? path
-    files = Dir.glob(File.join(path, "*.feature"))
+    files = Dir.glob(File.join(features_path, "*.feature"))
   else
-    files = [path]
+    files = [features_path]
   end
 
-  gherkify = Gherkify.parse_files(files, {output_dir: output_dir})
-  # gherkify.fetch_diagram_images
-  puts gherkify.to_md('index.md') unless opts.dry?
+  debug = opts.dry?
+  gherkify = Gherkify.parse_files(files, {output_dir: output_dir, debug: debug})
+
+  unless opts.dry?
+    gherkify.fetch_diagram_images(image_path)
+    gherkify.to_md('index.md')
+  end
+
   puts gherkify.to_s if opts.dry?
     
-
 end
-
-
-
 
 
 # url: http://yuml.me/diagram/scruffy;scale:80;/class/

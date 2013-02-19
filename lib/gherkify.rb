@@ -14,7 +14,8 @@ class Gherkify
 
     @options = {
       show_notes: false,
-      output_dir: '.'
+      output_dir: '.',
+      debug: false
     }.merge options
   end
 
@@ -66,8 +67,8 @@ class Gherkify
     end
   end
 
-  def fetch_diagram_images
-    output_dir = @options[:output_dir]
+  def fetch_diagram_images(image_path=nil)
+    output_dir = image_path || @options[:output_dir]
 
     pngs = []
     Dir.chdir(output_dir) do
@@ -94,7 +95,7 @@ class Gherkify
 
   def to_md(file=nil)
 
-    fetch_diagram_images
+    # fetch_diagram_images
 
     output_dir = @options[:output_dir]
 
