@@ -163,13 +163,6 @@ class Gherkify::FeatureYuml
     }
   end
 
-  def optimize_activity_steps(steps)
-    steps.each_with_index do |e, i|
-
-    end
-    steps
-  end
-
   def self.activity(scenario, scale=75)
     ssteps = scenario[:steps]
     yuml = YUML::activityDiagram( :scruffy, :scale => scale ){}
@@ -252,9 +245,12 @@ class Gherkify::FeatureYuml
       prev_step = curr_step
     end
 
-    steps[:ok] << ((prev_connector.nil?) ? last_step : "|#{prev_connector}|") + "->(end)"
-
-    # final_steps = optimize_activity_steps(steps[:ok])
+    # End
+    if !prev_connector.nil?
+      steps[:ok] << "|#{prev_connector}|->(end)"
+    else 
+      steps[:ok][-1] = steps[:ok].last + "->(end)"
+    end
 
     steps[:ok].each do |e|
       yuml.link_s e
