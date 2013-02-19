@@ -33,7 +33,7 @@ Feature: Download sales PDF files
     When I click on the link to download the PDF file
     Then my browser should download a file in PDF format
 
-  @javascript
+  @javascript @gherkify-ignore
   Scenario: Can't download if check not completed
     Given I have a document batch in progress
     When I view the Sales PDF batches list

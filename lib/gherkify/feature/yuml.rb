@@ -143,6 +143,8 @@ class Gherkify::FeatureYuml
         curr_step = :then
       when 'And'
         curr_step = prev_step
+      when 'But'
+        curr_step = prev_step
       end
 
       if curr_step != prev_step && prev_step != :trash

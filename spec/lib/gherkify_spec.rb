@@ -4,8 +4,9 @@ describe Gherkify do
 
   it "should parse file" do    
     file = fixture_path('download_files.feature')
-    ret = Gherkify.parse_file(file)
-    pending
+    gherkify = Gherkify.parse_file(file)
+    features = gherkify.features
+    features.count.should == 1
   end
 
   it "should parse complex feature" do

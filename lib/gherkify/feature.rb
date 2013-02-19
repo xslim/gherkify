@@ -28,8 +28,17 @@ class Gherkify::Feature
     trim(@data[:name])
   end
 
+  def scenario_tags(scenario)
+    return [] if scenario[:tags].nil?
+    scenario[:tags].collect { |e| e[:name] }
+  end
+
   def scenarios
-    @data[:elements].select { |e| e[:keyword] == 'Scenario' }
+    @data[:elements].select do |e| 
+      is_scenario = e[:keyword] == 'Scenario'
+      ignore = scenario_tags(e).include?('@gherkify-ignore')
+      is_scenario && !ignore
+    end
   end
 
   def scenario_name(scenario)

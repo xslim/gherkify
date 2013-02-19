@@ -15,7 +15,8 @@ require 'awesome_print'
 def main
   opts = Slop.parse(help: true) do
     banner 'Usage: gherkify path [options]'
-    on 'd', 'dir', 'Output directory', argument: :optional
+    on 'o', 'dir', 'Output directory', argument: :optional
+    on 'd', 'dry', 'Output directory', argument: :optional
   end
 
   path = ARGV[0]
@@ -32,8 +33,8 @@ def main
 
   gherkify = Gherkify.parse_files(files, {output_dir: output_dir})
   # gherkify.fetch_diagram_images
-  puts gherkify.to_md('index.md')
-  # puts gherkify.to_s
+  puts gherkify.to_md('index.md') unless opts.dry?
+  puts gherkify.to_s if opts.dry?
     
 
 end
