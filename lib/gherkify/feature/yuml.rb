@@ -123,12 +123,12 @@ class Gherkify::FeatureYuml
     do_results = false
     prev_connector = nil
     first_step = true
-    last_step = nil
 
     num_steps = ssteps.count
 
     # start with start
-    steps[:ok] << yuml._(:start).to_s
+    last_step = yuml._(:start).to_s
+    steps[:ok] << last_step
 
     ssteps.each_with_index do |e, i|
       step = trim(e[:name])
@@ -162,8 +162,11 @@ class Gherkify::FeatureYuml
         first_step = false
       end
 
-      # collect next data
+      # Clean up step a bit
+      step.sub!(/^I am /i, '') if strip_i
       step.sub!(/^I /i, '') if strip_i
+
+      # collect next data
       steps[curr_step] << step
 
       # dump the last one

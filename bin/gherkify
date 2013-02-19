@@ -17,6 +17,7 @@ def main
     on 'o', 'dir', 'Output directory', argument: :optional
     on 'dry', 'Output directory', argument: :optional
     on 'p', 'project', 'Generate project', argument: :optional
+    on 'add-features', 'Add features as Use cases to generated document', argument: :optional
   end
 
   path = ARGV[0]
@@ -29,22 +30,33 @@ def main
 
   if opts.project?
     output_dir = path
-    features_path = File.join(path, 'features') 
-    image_path = File.join(path, 'images') 
+    features_path = (path != '.') ? File.join(path, 'features') : 'features'
+    image_path = (path != '.') ? File.join(path, 'images') : 'images'
   end
   
 
-  if File.directory? path
+  if File.directory? features_path
     files = Dir.glob(File.join(features_path, "*.feature"))
   else
     files = [features_path]
   end
 
   debug = opts.dry?
-  gherkify = Gherkify.parse_files(files, {output_dir: output_dir, debug: debug})
 
-  unless opts.dry?
-    gherkify.fetch_diagram_images(image_path)
+  options = {
+    output_dir: output_dir, 
+    debug: debug,
+    image_path: image_path,
+    add_features: opts.add_features?
+  }
+
+  gherkify = Gherkify.parse_files(files, options)
+
+  if opts.dry?
+    puts "Generated Markdown:"
+    puts gherkify.to_md()
+  else
+    gherkify.fetch_diagram_images
     gherkify.to_md('index.md')
   end
 

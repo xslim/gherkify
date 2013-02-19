@@ -15,7 +15,8 @@ class Gherkify
     @options = {
       show_notes: false,
       output_dir: '.',
-      debug: false
+      debug: false,
+      add_features: false
     }.merge options
   end
 
@@ -44,6 +45,7 @@ class Gherkify
   end
 
   def parse_files(files=nil)
+    @files = files if !files.nil?
     files = @files if files.nil?
 
     io = StringIO.new
@@ -67,8 +69,8 @@ class Gherkify
     end
   end
 
-  def fetch_diagram_images(image_path=nil)
-    output_dir = image_path || @options[:output_dir]
+  def fetch_diagram_images
+    output_dir = @options[:image_path]
 
     pngs = []
     Dir.chdir(output_dir) do
@@ -93,6 +95,10 @@ class Gherkify
     s * "\n"
   end
 
+  def img_path(image_name)
+    File.join(@options[:image_path], "#{image_name}.png")
+  end
+
   def to_md(file=nil)
 
     # fetch_diagram_images
@@ -108,7 +114,7 @@ class Gherkify
       # s << "*TODO: Fetch and store use_case by MD5: #{use_case.md5}*"
       s << ''
       # s << "```\n#{use_case.to_s}```"
-      s << "![#{feature.name}](#{use_case.md5}.png)"
+      s << "![#{feature.name}](#{img_path(use_case.md5)})"
 
       feature.scenarios.each do |e|
         name = feature.scenario_name(e)
@@ -117,9 +123,24 @@ class Gherkify
         # s << "*TODO: Fetch and store activity by MD5: #{activity.md5}*"
         s << ''
         # s << "```\n#{activity.to_s}```"
-        s << "![#{name}](#{activity.md5}.png)"
+        s << "![#{name}](#{img_path(activity.md5)})"
       end
     end
+
+    if @options[:add_features]
+      s << ''
+      s << "## Use cases listing"
+      @files.each do |f_file| 
+        f = File.open(f_file, "rb")
+        contents = f.read
+        s << ''
+        s << '``` gherkin'
+        s << contents
+        s << '```'
+        s << ''
+      end
+    end
+
     s = s * "\n"
     return s if file.nil?
 
