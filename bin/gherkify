@@ -15,7 +15,8 @@ def main
   opts = Slop.parse(help: true) do
     banner 'Usage: gherkify path [options]'
     on 'o', 'dir', 'Output directory', argument: :optional
-    on 'dry', 'Output directory', argument: :optional
+    on 'dry', 'Dry run. Do nothing', argument: :optional
+    on 'md', 'Generate Markdown document', argument: :optional
     on 'p', 'project', 'Generate project', argument: :optional
     on 'add-features', 'Add features as Use cases to generated document', argument: :optional
   end
@@ -52,16 +53,15 @@ def main
 
   gherkify = Gherkify.parse_files(files, options)
 
-  if opts.dry?
+  if opts.dry? && opts.md?
     puts "Generated Markdown:"
     puts gherkify.to_md()
+  elsif opts.dry? && !opts.md?
+    puts gherkify.to_s
   else
     gherkify.fetch_diagram_images
     gherkify.to_md('index.md')
   end
-
-  puts gherkify.to_s if opts.dry?
-    
 end
 
 

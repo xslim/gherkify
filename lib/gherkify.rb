@@ -87,11 +87,42 @@ class Gherkify
       end
     end
 
+    check_and_fetch_diagram(yuml_ui_elements, pngs, output_dir) if yuml_ui_elements
+
+  end
+
+  def ui_elements_merge!(all, current)
+    #@ui_screens[screen_name] = { buttons: [], connections: [] } if @ui_screens[screen_name].nil?
+    current.each do |screen_name, data|
+      if all[screen_name].nil?
+        all[screen_name] = data
+        next
+      else
+        all[screen_name].each do |k, v|
+          all[screen_name][k] += data[k] if !data[k].nil?
+          all[screen_name][k].uniq!
+        end
+      end
+    end
+  end
+
+  def collect_ui_elements
+    all_elements = {}
+    features.each do |feature|
+      elements = feature.ui_elements
+      ui_elements_merge!(all_elements, elements)
+    end
+    all_elements
+  end
+
+  def yuml_ui_elements
+    @yuml_ui_elements ||= Gherkify::FeatureYuml.ui_elements(collect_ui_elements)
   end
 
   def to_s
     s = []
     features.each { |e| s << e.to_s }
+    s << "UI elements:" << yuml_ui_elements.to_s if yuml_ui_elements
     s * "\n"
   end
 
@@ -112,19 +143,27 @@ class Gherkify
 
       use_case = feature.yuml.use_case
       # s << "*TODO: Fetch and store use_case by MD5: #{use_case.md5}*"
-      s << ''
       # s << "```\n#{use_case.to_s}```"
       s << "![#{feature.name}](#{img_path(use_case.md5)})"
+      s << ''
 
       feature.scenarios.each do |e|
         name = feature.scenario_name(e)
         activity = feature.yuml.activity(e)
         s << "- **#{name}**"
         # s << "*TODO: Fetch and store activity by MD5: #{activity.md5}*"
-        s << ''
         # s << "```\n#{activity.to_s}```"
         s << "![#{name}](#{img_path(activity.md5)})"
+        s << ''
       end
+    end
+
+    if yuml_ui_elements
+      s << "## UI Elements"
+      s << "*Screens and actions*"
+      s << "![UI Screens and actions](#{img_path(yuml_ui_elements.md5)})"
+      # s << yuml_ui_elements.to_s
+      s << ''
     end
 
     if @options[:add_features]

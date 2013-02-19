@@ -16,6 +16,10 @@ module SupportHelpers
     File.join(File.dirname(__FILE__), 'fixtures', name)
   end
 
+  def trim_text_lines!(text)
+    text.replace text.split("\n").collect {|e| e.strip!} * "\n"
+  end
+
 
 end
 

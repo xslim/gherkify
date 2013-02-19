@@ -6,7 +6,7 @@ Feature: Cities
   Scenario: Searching
     Given I am on 'Kiev' city screen
      When I enter cities setting screen
-      And I touch add button
+      And I touch Add button
       And I enter 'Amsterdam' in search field
      Then I should see 'Amsterdam' table row
 

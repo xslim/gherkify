@@ -49,6 +49,10 @@ class Gherkify::Feature
     scenarios.collect { |e| scenario_name(e) }
   end
 
+  def ui_elements
+    yuml.collect_ui_elements(scenarios)
+  end
+
   def yuml
     @yuml ||= Gherkify::FeatureYuml.new(self)
   end
@@ -60,7 +64,7 @@ class Gherkify::Feature
     use_case = yuml.use_case
     s << "Use Case: #{use_case.md5}"
     s << use_case.to_s
-    s << "Activities: "
+    s << "Activities:"
 
     scenarios.each do |e|
       name = scenario_name(e)
@@ -68,6 +72,9 @@ class Gherkify::Feature
       s << "#{name} #{activity.md5}:"
       s << "#{activity.to_s}"
     end
+
+    # s << "UI elements:"
+    # s << "#{ui_elements.inspect}" 
 
     s * "\n"
   end
