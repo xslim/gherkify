@@ -16,7 +16,8 @@ class Gherkify
       show_notes: false,
       output_dir: '.',
       debug: false,
-      add_features: false
+      add_features: false,
+      format_octopress: false,
     }.merge options
   end
 
@@ -57,8 +58,8 @@ class Gherkify
     end
 
     formatter.done
-    # ap JSON.parse(io.string, :symbolize_names => true)
     features_data = JSON.parse(io.string, :symbolize_names => true)
+    # ap JSON.parse(io.string, :symbolize_names => true)
     @features = features_data.collect { |e| Gherkify::Feature.new(e)  }
   end
 
@@ -130,6 +131,11 @@ class Gherkify
     File.join(@options[:image_path], "#{image_name}.png")
   end
 
+  def md_img_tag(image_name, alt='')
+    return "{% photo #{img_path(image_name)} #{alt} %}" if @options[:format_octopress]
+    "![#{alt}](#{img_path(image_name)})"
+  end
+
   def to_md(file=nil)
 
     # fetch_diagram_images
@@ -144,24 +150,24 @@ class Gherkify
       use_case = feature.yuml.use_case
       # s << "*TODO: Fetch and store use_case by MD5: #{use_case.md5}*"
       # s << "```\n#{use_case.to_s}```"
-      s << "![#{feature.name}](#{img_path(use_case.md5)})"
+      s << md_img_tag(use_case.md5, feature.name) << ''
       s << ''
 
       feature.scenarios.each do |e|
         name = feature.scenario_name(e)
         activity = feature.yuml.activity(e)
-        s << "- **#{name}**"
+        s << "- **#{name}**" << ''
         # s << "*TODO: Fetch and store activity by MD5: #{activity.md5}*"
         # s << "```\n#{activity.to_s}```"
-        s << "![#{name}](#{img_path(activity.md5)})"
+        s << md_img_tag(activity.md5, name) << ''
         s << ''
       end
     end
 
     if yuml_ui_elements
       s << "## UI Elements"
-      s << "*Screens and actions*"
-      s << "![UI Screens and actions](#{img_path(yuml_ui_elements.md5)})"
+      s << "*Screens and actions*" << ''
+      s << md_img_tag(yuml_ui_elements.md5, "UI Screens and actions") << ''
       # s << yuml_ui_elements.to_s
       s << ''
     end

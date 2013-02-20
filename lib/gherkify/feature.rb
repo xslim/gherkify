@@ -8,6 +8,10 @@ class Gherkify::Feature
       show_notes: false
     }.merge options
   end
+
+  def data
+    @data
+  end
   
   def actor
     @data[:description].split("\n").each do |e|
