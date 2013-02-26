@@ -23,9 +23,7 @@ class Gherkify
     @options = {
       show_notes: false,
       output_dir: '.',
-      debug: false,
-      add_features: false,
-      format_octopress: false,
+      debug: false
     }.merge options
   end
 

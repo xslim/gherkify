@@ -18,8 +18,6 @@ def main
     on 'dry', 'Dry run. Do nothing', argument: :optional
     on 'md', 'Generate SRS Markdown document', argument: :optional
     on 'p', 'project', 'Generate project', argument: :optional
-    on 'add-features', 'Add features as Use cases to generated document', argument: :optional
-    on 'octopress', 'Generate Markdown for Octopress', argument: :optional
   end
 
   path = ARGV[0]
@@ -51,9 +49,7 @@ def main
   options = {
     output_dir: output_dir, 
     debug: debug,
-    image_path: image_path,
-    add_features: opts.add_features?,
-    format_octopress: opts.octopress?
+    image_path: image_path
   }
 
   gherkify = Gherkify.parse_files(files, options)
