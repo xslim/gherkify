@@ -137,14 +137,14 @@ class Gherkify
 
   def to_md(file=nil)
 
+    output_dir = @options[:output_dir]
+    image_path = @options[:image_path].sub!(/^#{output_dir}[\/]?/, '')
+
     srs_opts = {
-      image_path: @options[:image_path]
+      image_path: image_path
     }
 
     res = Gherkify::SRS.generate(self, srs_opts)
-    
-    output_dir = @options[:output_dir]
-
     return res if file.nil?
 
     writer = open(File.join(output_dir, file), "wb")

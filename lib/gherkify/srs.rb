@@ -73,7 +73,7 @@ class Gherkify::SRS
       template: template_path,
       image_path: '',
       show_gherkin_src: true,
-      show_yuml_src: true
+      # show_yuml_src: true
     }.merge options
 
     srs = Gherkify::SRS.new(gherkify, options)

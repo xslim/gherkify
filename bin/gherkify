@@ -38,6 +38,8 @@ def main
 
   if File.directory? features_path
     files = Dir.glob(File.join(features_path, "*.feature"))
+  elsif File.directory? path
+    files = Dir.glob(File.join(path, "*.feature"))
   else
     files = [features_path]
   end

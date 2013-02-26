@@ -37,12 +37,12 @@ Possible diagram of interconnection between screens and actions
 {{/if}}
   
   {{#each scenarios}}
-  ### {{name}}
-  {{#if image}}![{{name}}]({{image}}){{/if}}
-  {{#if yuml}}
-  ``` yuml activity
-  {{{yuml}}}
-  ```
+### {{name}}
+{{#if image}}![{{name}}]({{image}}){{/if}}
+{{#if yuml}}
+``` yuml activity
+{{{yuml}}}
+```
   {{/if}}
 
   {{/each}}
