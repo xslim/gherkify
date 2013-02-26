@@ -16,7 +16,7 @@ def main
     banner 'Usage: gherkify path [options]'
     on 'o', 'dir', 'Output directory', argument: :optional
     on 'dry', 'Dry run. Do nothing', argument: :optional
-    on 'md', 'Generate Markdown document', argument: :optional
+    on 'md', 'Generate SRS Markdown document', argument: :optional
     on 'p', 'project', 'Generate project', argument: :optional
     on 'add-features', 'Add features as Use cases to generated document', argument: :optional
     on 'octopress', 'Generate Markdown for Octopress', argument: :optional
@@ -35,13 +35,14 @@ def main
     features_path = (path != '.') ? File.join(path, 'features') : 'features'
     image_path = (path != '.') ? File.join(path, 'images') : 'images'
   end
-  
 
   if File.directory? features_path
     files = Dir.glob(File.join(features_path, "*.feature"))
   else
     files = [features_path]
   end
+
+  return if files.nil? || files.count == 0
 
   debug = opts.dry?
 
@@ -65,9 +66,5 @@ def main
     gherkify.to_md('index.md')
   end
 end
-
-
-# url: http://yuml.me/diagram/scruffy;scale:80;/class/
-# params: dsl_text = [Customer]->[Billing Address]
 
 main

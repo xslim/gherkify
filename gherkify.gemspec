@@ -19,7 +19,8 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'gherkin'
   gem.add_dependency 'slop'
-  # gem.add_dependency 'ruby-yuml'
+  gem.add_dependency 'ruby-yuml'
+  gem.add_dependency 'handlebars'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'

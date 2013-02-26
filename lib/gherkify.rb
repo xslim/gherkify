@@ -1,13 +1,21 @@
 require 'gherkify/version'
 require 'gherkify/feature'
+require 'gherkify/srs'
 
 require 'gherkin/parser/parser'
 require 'gherkin/formatter/json_formatter'
 require 'stringio'
 require 'json'
 
-
 class Gherkify
+
+  def self.path_to_resource(name)
+    File.join(Gherkify.path_to_resources, name)
+  end
+
+  def self.path_to_resources
+    File.join(File.dirname(File.expand_path(__FILE__)), '..','resources')
+  end
 
   def initialize(files, options={})
     @files = files
@@ -127,72 +135,21 @@ class Gherkify
     s * "\n"
   end
 
-  def img_path(image_name)
-    File.join(@options[:image_path], "#{image_name}.png")
-  end
-
-  def md_img_tag(image_name, alt='')
-    return "{% photo #{img_path(image_name)} #{alt} %}" if @options[:format_octopress]
-    "![#{alt}](#{img_path(image_name)})"
-  end
-
   def to_md(file=nil)
 
-    # fetch_diagram_images
+    srs_opts = {
+      image_path: @options[:image_path]
+    }
 
+    res = Gherkify::SRS.generate(self, srs_opts)
+    
     output_dir = @options[:output_dir]
 
-    s = []
-    s << "## Features"
-    features.each do |feature|
-      s << "### #{feature.name}"
-
-      use_case = feature.yuml.use_case
-      # s << "*TODO: Fetch and store use_case by MD5: #{use_case.md5}*"
-      # s << "```\n#{use_case.to_s}```"
-      s << md_img_tag(use_case.md5, feature.name) << ''
-      s << ''
-
-      feature.scenarios.each do |e|
-        name = feature.scenario_name(e)
-        activity = feature.yuml.activity(e)
-        s << "- **#{name}**" << ''
-        # s << "*TODO: Fetch and store activity by MD5: #{activity.md5}*"
-        # s << "```\n#{activity.to_s}```"
-        s << md_img_tag(activity.md5, name) << ''
-        s << ''
-      end
-    end
-
-    if yuml_ui_elements
-      s << "## UI Elements"
-      s << "*Screens and actions*" << ''
-      s << md_img_tag(yuml_ui_elements.md5, "UI Screens and actions") << ''
-      # s << yuml_ui_elements.to_s
-      s << ''
-    end
-
-    if @options[:add_features]
-      s << ''
-      s << "## Use cases listing"
-      @files.each do |f_file| 
-        f = File.open(f_file, "rb")
-        contents = f.read
-        s << ''
-        s << '``` gherkin'
-        s << contents
-        s << '```'
-        s << ''
-      end
-    end
-
-    s = s * "\n"
-    return s if file.nil?
+    return res if file.nil?
 
     writer = open(File.join(output_dir, file), "wb")
-    writer.write(s)
+    writer.write(res)
     writer.close
-
   end
 
 end
